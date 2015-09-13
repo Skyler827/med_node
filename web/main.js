@@ -6,7 +6,7 @@ app.controller("med_node_ctl", ['$http', '$scope', function($http, $scope) {
     $scope.loggedin = false;
     $scope.loginFormUserName = "";
     $scope.loginFormPassword = "";
-
+    $scope.showRegistrationForm = false;
     $scope.login = function() {
         console.log("login?");
         $http.put("/login", {}).then(function(response) {
