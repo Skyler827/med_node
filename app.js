@@ -9,7 +9,8 @@ var number_of_specialties = 0;
 db.execute_sql_file("dropdb.sql")
 .then(db.execute_sql_file("create_tables.sql"))
 .then(function() {
-    return fs.readFile('./data/specialties.csv').then(function(file_text) {
+    return fs.readFile('./data/specialties.csv')
+    .then(function(file_text) {
         var lines = file_text.split('\n');
         var vals = [];
         for (var i=0; i<lines.length; i++) {
@@ -43,31 +44,24 @@ db.execute_sql_file("dropdb.sql")
     //generate physicians
     var number_of_physicians = 60;
     var physicians = [];
-    var physician_users = [];
     for (var i=0; i<number_of_physicians; i++) {
+        var fn = get_random_first_name()
+        var ln = get_random_last_name()
         var p = {
-            firstname: get_random_first_name(),
-            lastname: get_random_last_name(),
-        };
-        physicians.push(p.firstname+', '+p.lastname);
-        var u = {
-            username: p.firstname+p.lastname,
-            email: p.firstname+p.lastname+'@hospital.com',
+            firstname: fn,
+            lastname: ln,
+            username: fn+ln,
+            email: fn+ln+'@hospital.com',
             password: 'hunter2'
         };
-        physician_users.push(u.username +', '+u.email+', '+u.password);
+        physicians.push(['Physician',p.firstname,p.lastname,
+            p.username,p.email,p.password].join(','));
     }
 
     return db.run_query({
-        sql:"INSERT INTO _user (username, email, password) "+
-            "VALUES ("+physician_users.join('), (')+') '+
+        sql:"INSERT INTO _user (type, firstname, lastname, username, email, password) "+
+            "VALUES ("+physicians.join('), (')+') '+
             "RETURNING id"
-    })
-    .then(function(result2) {
-        return db.run_query({
-            sql:"INSERT INTO physician (firstname, lastname, specialty) "+
-                "VALUES ("+physicians.join('), (')+")"
-        });
     });
 
 });
@@ -83,6 +77,11 @@ app.get('/', function(req, res) {
 app.use("/login", function(req, res) {
     console.log("login?");
     // check to see if the user
+    db.run_query({sql:"SELECT * FROM _user;"})
+    .then(function(result) {
+        res.send(result);
+        console.log(result);
+    });
 });
 app.use(function(req, res, next) {
     console.log(req.method +': '+req.url);
