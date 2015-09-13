@@ -45,10 +45,11 @@ self.run_query = function (o) {
 
 self.execute_sql_file = function (filename) {
     return new Promise(function(resolve, reject) {
-        var filePath = __dirname.slice(0,-3)+filename;
+        var filePath = __dirname+'/'+filename;
         console.log("reading file: "+filePath);
         fs.readFile(filePath, 'utf8')
         .then(function(data) {
+            console.log(data);
             var sql_statements = data.split(';');
             var evaluate_promise = function() {
                 if (sql_statements.length == 0) {

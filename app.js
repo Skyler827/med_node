@@ -7,7 +7,13 @@ var app = express();
 var number_of_specialties = 0;
 // refresh db
 db.execute_sql_file("dropdb.sql")
+.catch(function(err) {
+    throw err;
+})
 .then(db.execute_sql_file("create_tables.sql"))
+.catch(function(err) {
+    throw err;
+})
 .then(function() {
     return fs.readFile('./data/specialties.csv')
     .then(function(file_text) {
@@ -64,7 +70,8 @@ db.execute_sql_file("dropdb.sql")
             "RETURNING id"
     });
 
-});
+})
+.catch(function(err) {throw err;});
 app.get('/', function(req, res) {
     console.log(req.method +': '+req.url);
     var options = {
