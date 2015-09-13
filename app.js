@@ -4,14 +4,22 @@ var db = require('./data.js');
 
 var app = express();
 
+var number_of_specialties = 0;
 // refresh db
 db.execute_sql_file("dropdb.sql")
 .then(db.execute_sql_file("create_tables.sql"))
 .then(function() {
     return fs.readFile('./data/specialties.csv').then(function(file_text) {
         var lines = file_text.split('\n');
+        var vals = [];
+        for (var i=0; i<lines.length; i++) {
+            vals.push(lines[i].split('\t').join(', '));
+        }
+        var ans = vals.join('), (');
+        number_of_specialties = ans.length;
         return {
-            sql:"INSERT INTO specialty (name, description) VALUES"
+            sql:"INSERT INTO specialty (name, description) "+
+                "VALUES ("+ans+");"
         }
     })
     .then(db.run_query);
@@ -41,15 +49,25 @@ db.execute_sql_file("dropdb.sql")
             firstname: get_random_first_name(),
             lastname: get_random_last_name(),
         };
-        physicians.push(p);
-        physician_users.push({
+        physicians.push(p.firstname+', '+p.lastname);
+        var u = {
             username: p.firstname+p.lastname,
             email: p.firstname+p.lastname+'@hospital.com',
             password: 'hunter2'
-        });
+        };
+        physician_users.push(u.username +', '+u.email+', '+u.password);
     }
+
     return db.run_query({
-        sql:"INSERT INTO physician (firstname, lastname, )"
+        sql:"INSERT INTO _user (username, email, password) "+
+            "VALUES ("+physician_users.join('), (')+') '+
+            "RETURNING id"
+    })
+    .then(function(result2) {
+        return db.run_query({
+            sql:"INSERT INTO physician (firstname, lastname, specialty) "+
+                "VALUES ("+physicians.join('), (')+")"
+        });
     });
 
 });

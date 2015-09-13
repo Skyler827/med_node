@@ -1,7 +1,12 @@
+CREATE TYPE AS ENUM ('Physician', 'Patient');
 CREATE TABLE _user (
+    id        SERIAL PRIMARY KEY,
     username  VARCHAR,
+    firstname VARCHAR,
+    lastname  VARCHAR,
     email     VARCHAR,
     password  VARCHAR
+    specialty INT REFERENCES specialty(id)
 );
 CREATE TABLE cookie (
     identifier CHAR(30),
@@ -12,23 +17,10 @@ CREATE TABLE specialty (
     name        VARCHAR,
     description VARCHAR
 );
-CREATE TABLE physician (
-    id        SERIAL PRIMARY KEY,
-    firstname VARCHAR,
-    lastname  VARCHAR,
-    user_id   INT REFERENCES _user(id),
-    specialty INT REFERENCES specialty(id)
-);
 CREATE TABLE shift (
     start      TIMESTAMP WITH TIME ZONE,
     stop       TIMESTAMP WITH TIME ZONE,
     physician  INT REFERENCES physician(id)
-);
-CREATE TABLE patient (
-    id SERIAL PRIMARY KEY,
-    firstname VARCHAR,
-    lastname  VARCHAR,
-    user_id   INT REFERENCES _user(id)
 );
 CREATE TABLE appointment (
     start      TIMESTAMP WITH TIME ZONE,
