@@ -3,7 +3,14 @@ var fs = require('fs-promise');
 var database_ref = "postgres://audittool:password@localhost/med_node";
 
 var self = {};
-
+/** runquery(o):
+* parameter o = options object
+* one mandatory attribute/parameter: sql
+* two optional attributes/parameters:
+*    values: if given, this will be a paramaterized query
+*    onrow: a function taking a row object and a result object
+* see https://github.com/brianc/node-postgres/wiki/Query#events for details
+*/
 self.run_query = function (o) {
     return new Promise(function(resolve, reject) {
         pg.connect(database_ref, function (err, client, done) {
@@ -49,27 +56,17 @@ self.execute_sql_file = function (filename) {
         console.log("reading file: "+filePath);
         fs.readFile(filePath, 'utf8')
         .then(function(data) {
-            console.log(data);
-            var sql_statements = data.split(';');
-            var evaluate_promise = function() {
-                if (sql_statements.length == 0) {
-                    return;
-                } else {
-                    return self.runquery({
-                        sql:sql_statements.shift()
-                    }).then(evaluate_promise);
-                }
-            };
-            return evaluate_promise();
+            return self.run_query({sql:data});
         }).catch(function(err){
             //console.log(err);
             reject(err);
             throw err;
         }).then(function(result) {
-            resolve({
+            resolve();
+            /*{
                 statements: misc.indexes(sql_file_contents, ";").length,
                 tables: misc.indexes(sql_file_contents, "CREATE TABLE").length
-            });
+            }*/
         });
     });
 };

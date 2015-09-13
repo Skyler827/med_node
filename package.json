@@ -6,6 +6,6 @@
       "fs-promise":"^0.3"
   },
   "scripts": {
-    "start":"node app.js"
+    "start":"node db_refresh.js"
   }
 }

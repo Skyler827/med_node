@@ -13,35 +13,28 @@ CREATE TABLE _user (
     email     VARCHAR,
     password  VARCHAR,
     specialty INT REFERENCES specialty(id)
-    CHECK (_user_type='Physician' OR specialty IS NULL)
 );
-CREATE TABLE cookie (
-    identifier CHAR(30),
-    user       INT REFERENCES _user(id)
-);
+--CREATE TABLE cookie (
+--    identifier CHAR(30),
+--    user       INT REFERENCES _user(id)
+--);
 CREATE TABLE shift (
     start      TIMESTAMP WITH TIME ZONE,
     stop       TIMESTAMP WITH TIME ZONE,
-    physician  INT REFERENCES _user(id),
-    CHECK (physician.type='Physician')
+    physician  INT REFERENCES _user(id)
 );
 CREATE TABLE appointment (
+    id         SERIAL PRIMARY KEY,
     start      TIMESTAMP WITH TIME ZONE,
     stop       TIMESTAMP WITH TIME ZONE,
     physician  INT REFERENCES _user(id),
     patient    INT REFERENCES _user(id),
-    bill       INT REFERENCES bill(id)
-    CHECK (physician.type='Physician' AND patient.type='Patient')
+    cost       MONEY
 );
 CREATE TABLE bill_item (
-    bill        INT REFERENCES bill(id),
+    appointment INT REFERENCES appointment(id),
     name        VARCHAR,
     description VARCHAR,
-    physician   INT REFERENCES physician,
-    cost        MONEY,
-    CHECK (physician.type='Physician')
-);
-CREATE TABLE bill (
-    id          SERIAL PRIMARY KEY,
-    appointment INT REFERENCES appointment(id)
+    physician   INT REFERENCES _user(id),
+    cost        MONEY
 );
