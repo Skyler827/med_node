@@ -8,7 +8,7 @@
 	<h1>Med Node</h1>
 	<p>Hello world from a Med Node</p>
 	<div ng-hide="loggedin">
-		<form>
+		<form ng-hide="showRegistrationForm">
 			<table>
 				<tr>
 					<td><label for="loginFormUserName">User Name:</label></td>
@@ -20,6 +20,10 @@
 				</tr>
 			</table>
 			<button ng-click="login()">Log in</button>
+			<button ng-click="showRegistrationForm=true;">register</button>
+		</form>
+		<form ng-show="showRegistrationForm">
+			<button ng-click= "showRegistrationForm" > show Registration Form</button>
 		</form>
 	</div>
 	<div ng-show="loggedin">
